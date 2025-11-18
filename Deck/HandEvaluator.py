@@ -51,7 +51,9 @@ def evaluate_hand(hand: list[Card]):
             # Check for Ace-low straight
             if not is_straight and len(unique_rank) >= 5:
                 low_straight_ranks = [1,2,3,4,5]
+
                 has_ace = any(rank in [1,14] for rank in unique_rank)
+
                 has_low_cards = all(rank in unique_rank for rank in [2,3,4,5])
 
                 if has_ace and has_low_cards:
