@@ -16,16 +16,19 @@ def evaluate_hand(hand: list[Card]):
     suit_count = {}
 
     for card in hand:
+
         # The ranks
         if card.rank in rank_count:
             rank_count[card.rank] += 1
         else:
             rank_count[card.rank] = 1
+
         # The suits
         if card.suit in suit_count:
             suit_count[card.suit] += 1
         else:
             suit_count[card.suit] = 1
+
         # Checks for flush
         is_flush = False
         for count in suit_count.values():
