@@ -104,11 +104,17 @@ class DebugState(State):
 
     # ==============================
     # Input Handling
+    # BONO ESTHER
     # ==============================
     def userInput(self, events):
         if events.type == pygame.KEYDOWN:
+
+            if events.key == pygame.K_BACKQUOTE: #tecla ~
+                self.visible = not self.visible
+                print(f"[DEBUG] UI {'shown' if self.visible else 'hidden'}")
+
             # ↓ Toggle visibility
-            if events.key == pygame.K_DOWN:
+            elif events.key == pygame.K_DOWN:
                 self.visible = not self.visible
                 print(f"[DEBUG] UI {'shown' if self.visible else 'hidden'}")
 
