@@ -215,3 +215,20 @@ class DeckManager:
             dealtCards.append(card)
 
         return dealtCards
+
+#BONO - DEBUG
+    def generateRoyalFlushForDebug(self):
+        suit = Suit.HEARTS
+
+        needed = [Rank.TEN,
+                  Rank.JACK,
+                  Rank.QUEEN,
+                  Rank.KING,
+                  Rank.ACE]
+
+        hand = []
+        for rank in needed:
+            card = Card(suit=suit, rank=rank, image=None)
+            hand.append(card)
+
+        return hand

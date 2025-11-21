@@ -143,8 +143,50 @@ class DebugState(State):
                         # Otherwise go to level selection as usual
                         self.game_state.nextState = "LevelSelectState"
                         self.game_state.isFinished = True
+
+            # BONO: Add money (+500$)
             elif self.visible and events.key == pygame.K_UP:
-                print("[DEBUG] Adding 1$ to player money...")
+                print("[DEBUG] Adding $500 to player money...")
                 if self.game_state:
                     player = self.game_state.playerInfo
-                    player.playerMoney += 1
+                    player.playerMoney += 500
+
+            #BONO: Add a Planet (key P); solo si el menu esta visible
+            elif self.visible and events.key == pygame.K_p:
+                print("[DEBUG] Adding a Planet card to player...")
+
+                from Cards.Planets import PLANETS, PlanetCard
+                import random
+
+                if self.game_state:
+                    player = self.game_state.playerInfo
+                    planet_name = random.choice(list(PLANETS.keys()))
+                    planet_obj = PLANETS[planet_name]
+
+                    if hasattr(player, "planetCards"):
+                        player.planetCards.append(planet_obj)
+                    else:
+                        player.planetCards = [planet_obj]
+                    print(f"[DEBUG] Given Planet: {planet_name}")
+
+            #BONO: Force a High-Value Hand (Key S); solo si el menu es visible
+            elif self.visible and events.key == pygame.K_s:
+                print("[DEBUG] Forcing a Royal Flush hand...")
+
+                if not self.game_state or not hasattr(self.game_state, "playerInfo"):
+                    print("[ERROR] No player loaded yet.")
+                    return
+
+                player = self.game_state.playerInfo
+                handEval = player.deckManager
+
+                if hasattr(handEval, "generateRoyalFlushForDebug"):
+                    royal_flush_hand = handEval.generateRoyalFlushForDebug()
+                    player.currentHand = royal_flush_hand
+
+                    player.debugForcedHand = "royal_flush"
+
+                    print("[DEBUG] Royal Flush forced:", " ".join(str(c) for c in royal_flush_hand))
+
+                else:
+                    print("[ERROR] deckManager does not support Royal Flush generation.")
