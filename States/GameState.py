@@ -801,6 +801,74 @@ class GameState(State):
         #       self.activated_jokers.add("joker card name")
         #   The last line ensures the Joker is visibly active and its effects are properly applied.
 
+        # The Joker +4 multiplier
+        if "The Joker" in owned:
+            self.multiplier += 4
+            self.activated_jokers.add("The Joker")
+
+        # Michael Myers adds random multiplier from 0 to 23
+        if "Michael Myers" in owned:
+            random_mult = random.randint(0,23)
+            self.multiplier += random_mult
+            self.activated_jokers.add("Michael Myers")
+
+        # Fibonacci each Ace gives +8 multiplier
+        if "Fibonacci" in owned:
+            fibonacci_ranks = {1,2,3,5,8}
+            for card in self.hand:
+                if card.rank in fibonacci_ranks:
+                    self.multiplier += 8
+            self.activated_jokers.add("Fibonacci")
+
+        # Gauntlet +250 chips and -2 hand size
+        if "Gauntlet" in owned:
+            self.chips += 250
+            self.hand_size_limit = max(1, self.hand_size_limit - 2)
+            self.activated_jokers.add("Gauntlet")
+
+        # Ogre +3 multiplier for each Joker
+        if "Ogre" in owned:
+            joker_count = len(owned)
+            self.multiplier += 3 * joker_count
+            self.activated_jokers.add("Ogre")
+
+        # Straw Hat +100 chips then -5 chips for very hand
+        if "Straw Hat" in owned:
+            chips_bonus = 100 - (5 * self.hands_played_this_round)
+            self.chips += max(0, chips_bonus)
+            self.activated_jokers.add("Straw Hat")
+
+        # Hog Rider +100 chips if hand is a straight
+        if "Hog Rider" in owned:
+            if self.current_hand_type == "Straight":
+                self.chips += 100
+            self.activated_jokers.add("Hog Rider")
+
+        # ? Block +4 chips if hand uses exactly 4 cards
+        if "? Block" in owned:
+            if len(self.hand) == 4:
+                self.chips += 4
+            self.activated_jokers.add("? Block")
+
+        # Hogwarts each Ace gives +4 multiplier and +20 chips
+        if "Hogwarts" in owned:
+            aces_played = sum(1 for card in self.hand if card.rank == 1 or card.rank == 14)
+        # Check for Ace
+            self.multiplier += 4 * aces_played
+            self.chips += 20 * aces_played
+            self.activated_jokers.add("Hogwarts")
+
+        # 802 double the amount if it is last hand
+        if "802" in owned:
+            if self.amountOfHands == 0:
+        # Double chip and multiplier gains
+                self.chips *= 2
+                self.multiplier *= 2
+            self.activated_jokers.add("802")
+
+
+            
+
         procrastinate = False
 
         # commit modified player multiplier and chips
