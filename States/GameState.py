@@ -836,5 +836,49 @@ class GameState(State):
     #   iterations (no for/while loops) — the recursion itself must handle repetition. After the
     #   recursion finishes, reset card selections, clear any display text or tracking lists, and
     #   update the visual layout of the player's hand.
-    def discardCards(self, removeFromHand: bool):
-        self.updateCards(400, 520, self.cards, self.hand, scale=1.2)
+    def discardCards(self, removeFromHand: bool, cards_to_discard=None, index=0):
+        # Initializes the discard list
+        if cards_to_discard is None:
+            cards_to_discard = []
+        # Find selected cards in the current hand
+            for card in self.hand:
+                if hasattr(card, 'isSelected') and card.isSelected:
+                    cards_to_discard.append(card)
+
+        # No more cards to process
+        if index >= len(cards_to_discard):
+            # Draw new cards and reset call
+            if removeFromHand:
+                # replace cards
+                cards_to_draw = len(cards_to_discard)
+                for i in range(cards_to_draw):
+                    if self.deckManager.deck:
+                        new_card = self.deckManager.deck.pop(0)
+                        self.hand.append(new_card)
+
+                # Reset selections
+                for card in self.hand:
+                    card.isSelected = False
+
+                # Clear discard related text
+                if hasattr(self, 'discard_text'):
+                    self.discard_text = ""
+
+                # Update Visuals
+                self.updateCards(400, 520, self.cards, self.hand, scale=1.2)
+            return
+
+        # Recursive
+        current_card = cards_to_discard[index]
+
+        if removeFromHand:
+            # Add to discard pile
+            if current_card in self.hand:
+                self.hand.remove(current_card)
+                # add to discard pile if exists
+                if hasattr(self, 'discard_pile'):
+                    self.discard_pile.append(current_card)
+
+        # Call for next card
+        self.discardCards(not removeFromHand, cards_to_discard, index + 1)
+
