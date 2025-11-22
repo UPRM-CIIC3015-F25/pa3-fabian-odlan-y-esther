@@ -579,24 +579,24 @@ class GameState(State):
     def SortCards(self, sort_by: str = "suit"):
         suitOrder = [Suit.HEARTS, Suit.CLUBS, Suit.DIAMONDS, Suit.SPADES]         # Define the order of suits
 
-        for index_card1 in range(len(self.cards)): #itero para obtener idx de cartas
-            for index_card2 in range(index_card1 + 1, len(self.cards)): #itero por idx de cartas + 1 para comparar
-                card1 = self.cards[index_card1]
-                card2 = self.cards[index_card2]
+        for index_card1 in range(len(self.hand)): #itero para obtener idx de cartas
+            for index_card2 in range(index_card1 + 1, len(self.hand)): #itero por idx de cartas + 1 para comparar
+                card1 = self.hand[index_card1]
+                card2 = self.hand[index_card2]
 
                 if sort_by == "suit":
                     suit_card1 = suitOrder.index(card1.suit)
                     suit_card2 = suitOrder.index(card2.suit)
 
                     if suit_card1 > suit_card2 or (suit_card1 == suit_card2 and card1.rank.value > card2.rank.value):
-                        self.cards[index_card1], self.cards[index_card2] = self.cards[index_card2], self.cards[index_card1]
+                        self.hand[index_card1], self.hand[index_card2] = self.hand[index_card2], self.hand[index_card1]
 
                 elif sort_by == "rank":
                     rank_card1 = card1.rank.value
                     rank_card2 = card2.rank.value
 
                     if rank_card1 > rank_card2 or (rank_card1 == rank_card2 and suitOrder.index(card1.suit) > suitOrder.index(card2.suit)):
-                        self.cards[index_card1], self.cards[index_card2] = self.cards[index_card2], self.cards[index_card1]
+                        self.hand[index_card1], self.hand[index_card2] = self.hand[index_card2], self.hand[index_card1]
         self.updateCards(400, 520, self.cards, self.hand, scale=1.2)
 
 
