@@ -3,6 +3,16 @@ from Deck.DeckManager import DeckManager
 from States.Core.StateClass import State
 from States.Core.PlayerInfo import PlayerInfo
 
+boss_abilities = {
+    "The Water": "Start with 0 discards",
+    "The Mark": "All Face cards are drawn face down",
+    "The House": "First hand is drawn face down",
+    "The Hook": "Discards 2 random cards held in hand after every played hand",
+    "The Manacle": "-1 hand size",
+    "The Needle": "Play only 1 hand"
+}
+
+
 class LevelSelectState(State):
     def __init__(self, playerInfo: PlayerInfo = None, nextState: str = "", deckManager: DeckManager = None):
         super().__init__(nextState)
