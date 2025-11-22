@@ -1,10 +1,12 @@
 import pygame
+import math
 import random
 from States.Menus.DebugState import DebugState
 from States.Core.StateClass import State
 from Cards.Card import Suit, Rank
 from States.Core.PlayerInfo import PlayerInfo
 from Deck.HandEvaluator import evaluate_hand
+
 
 
 HAND_SCORES = {
@@ -691,18 +693,18 @@ class GameState(State):
                 if i == 0:
                     consec = 1
                     seq_start = arr[0]
-                    cur_seq = [arr[0]]
+                    cur_sec = [arr[0]]
                 else:
                     if arr[i] == arr[i-1]:
                         continue
                     if arr[i] == arr[i-1] + 1:
                         consec += 1
-                        cur_seq.append(arr[i])
+                        cur_sec.append(arr[i])
                     else:
                         consec = 1
-                        cur_seq = [arr[i]]
+                        cur_sec = [arr[i]]
                     if consec >= 5:
-                        best_seq = cur_seq[-5:]
+                        best_seq = cur_sec[-5:]
                         break
             return best_seq  # may be empty
 
