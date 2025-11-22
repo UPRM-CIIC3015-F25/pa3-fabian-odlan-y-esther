@@ -3,14 +3,7 @@ from Deck.DeckManager import DeckManager
 from States.Core.StateClass import State
 from States.Core.PlayerInfo import PlayerInfo
 
-boss_abilities = {
-    "The Water": "Start with 0 discards",
-    "The Mark": "All Face cards are drawn face down",
-    "The House": "First hand is drawn face down",
-    "The Hook": "Discards 2 random cards held in hand after every played hand",
-    "The Manacle": "-1 hand size",
-    "The Needle": "Play only 1 hand"
-}
+
 
 
 class LevelSelectState(State):
@@ -125,7 +118,12 @@ class LevelSelectState(State):
         #   Each key should be the name of a boss (e.g., "The Mark", "The Needle", etc.), and each value should describe
         #   what unique restriction or ability that boss applies during the round.
         #   This dictionary will later be used to look up and apply special effects based on which boss is active.
-        boss_abilities = {
+        boss_abilities = {    "The Water": "Start with 0 discards",
+    "The Mark": "All Face cards are drawn face down",
+    "The House": "First hand is drawn face down",
+    "The Hook": "Discards 2 random cards held in hand after every played hand",
+    "The Manacle": "-1 hand size",
+    "The Needle": "Play only 1 hand"
 
         }
 
