@@ -15,6 +15,10 @@ class DeckManager:
             "Fibonacci", "Michael Myers", "? Block", "Hogwarts", "StrawHat",
             "802", "Ogre", "Hog Rider", "Gauntlet", "The Joker"
         ]
+
+        self.deck = []
+        self.joker_deck = []
+
     # ---------- Helpers ----------
     def _scaleToHeightIntegerish(self, surf: pygame.Surface, targetH: int) -> pygame.Surface:
         h = surf.get_height()

@@ -25,6 +25,7 @@ class GameState(State):
     def __init__(self, nextState: str = "", player: PlayerInfo = None):
         super().__init__(nextState)
         # ----------------------------Deck and Hand initialization----------------------------
+        self.discard_text = None
         self.playerInfo = player # playerInfo object
         self.deck = State.deckManager.shuffleDeck(State.deckManager.createDeck(self.playerInfo.levelManager.curSubLevel))
         self.hand = State.deckManager.dealCards(self.deck, 8)
@@ -234,7 +235,7 @@ class GameState(State):
                                 self.deselect_sfx.play()
 
 
-                self.discardCards(removeFromHand=True)
+                self.discardCards()
         self.draw()
         self.checkHoverCards()
         self.debugState.update()
@@ -473,7 +474,7 @@ class GameState(State):
 
             if self.discardButtonRect.collidepoint(mousePosPlayerOpcions):
                 if not self.playHandActive and len(self.cardsSelectedList) > 0 and self.playerInfo.amountOfDiscards > 0:
-                    self.discardCards(True)
+                    self.discardCards()
                     self.playerInfo.amountOfDiscards -= 1
 
             if self.playHandButtonRect.collidepoint(mousePosPlayerOpcions):
@@ -636,6 +637,24 @@ class GameState(State):
     
     # -------- Play Hand Logic -----------
     def playHand(self):
+
+        if not pygame.font.get_init():
+            pygame.font.init()
+
+        if not hasattr(self.playerInfo, 'textFont1') or self.playerInfo.textFont1 is None:
+            self.playerInfo.textFont1 = pygame.font.Font(None, 36)
+
+        if not hasattr(self.playerInfo, 'textFont2') or self.playerInfo.textFont2 is None:
+            self.playerInfo.textFont2 = pygame.font.Font(None, 24)
+
+        try:
+            self.playerInfo.curHandText = self.playerInfo.textFont1.render(self.playerInfo.curHandOfPlayer, False,'white')
+        except pygame.error as e:
+            print(f"Font rendering failed: {e}")
+
+            self.playerInfo.curHandText = pygame.Surface((200, 30))
+            self.playerInfo.curHandText.fill((50, 50, 50))
+
         if self.playerInfo.amountOfHands == 0: # Check if last hand and failed the round
             target_score = self.playerInfo.levelManager.curSubLevel.score
             if self.playerInfo.roundScore < target_score:
@@ -927,49 +946,49 @@ class GameState(State):
     #   iterations (no for/while loops) — the recursion itself must handle repetition. After the
     #   recursion finishes, reset card selections, clear any display text or tracking lists, and
     #   update the visual layout of the player's hand.
-    def discardCards(self, removeFromHand: bool, cards_to_discard=None, index=0):
+    def discardCards(self, cards_to_discard=None, index =0):
         # Initializes the discard list
         if cards_to_discard is None:
             cards_to_discard = []
-        # Find selected cards in the current hand
+            # Find selected cards in the current hand
             for card in self.hand:
                 if hasattr(card, 'isSelected') and card.isSelected:
                     cards_to_discard.append(card)
 
         # No more cards to process
         if index >= len(cards_to_discard):
-            # Draw new cards and reset call
-            if removeFromHand:
-                # replace cards
-                cards_to_draw = len(cards_to_discard)
-                for i in range(cards_to_draw):
-                    if self.deckManager.deck:
-                        new_card = self.deckManager.deck.pop(0)
-                        self.hand.append(new_card)
+            # replace cards
+            cards_to_draw = len(cards_to_discard)
+            for i in range(cards_to_draw):
+                if (hasattr(self.deckManager, 'deck') and self.deckManager.deck and len(self.deckManager.deck) > 0):
+                    new_card = self.deckManager.deck.pop(0)
+                    self.hand.append(new_card)
+                else:
+                    print("No cards left in deck")
+                    break
 
-                # Reset selections
-                for card in self.hand:
-                    card.isSelected = False
+            # Reset selections
+            for card in self.hand:
+                card.isSelected = False
 
-                # Clear discard related text
-                if hasattr(self, 'discard_text'):
-                    self.discard_text = ""
+            # Clear discard related text
+            if hasattr(self, 'discard_text'):
+                self.discard_text = ""
 
-                # Update Visuals
-                self.updateCards(400, 520, self.cards, self.hand, scale=1.2)
+            # Update Visuals
+            self.updateCards(400, 520, self.cards, self.hand, scale=1.2)
             return
 
         # Recursive
         current_card = cards_to_discard[index]
 
-        if removeFromHand:
-            # Add to discard pile
-            if current_card in self.hand:
-                self.hand.remove(current_card)
-                # add to discard pile if exists
-                if hasattr(self, 'discard_pile'):
-                    self.discard_pile.append(current_card)
+        # Add to discard pile
+        if current_card in self.hand:
+            self.hand.remove(current_card)
+            # add to discard pile if exists
+            if hasattr(self, 'discard_pile'):
+                self.discard_pile.append(current_card)
 
         # Call for next card
-        self.discardCards(not removeFromHand, cards_to_discard, index + 1)
+        self.discardCards(cards_to_discard, index + 1)
 
