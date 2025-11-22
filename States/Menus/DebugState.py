@@ -171,22 +171,27 @@ class DebugState(State):
 
             #BONO: Force a High-Value Hand (Key S); solo si el menu es visible
             elif self.visible and events.key == pygame.K_s:
-                print("[DEBUG] Forcing a Royal Flush hand...")
+                print("[DEBUG] Forcing a Straight Flush hand...")
 
                 if not self.game_state or not hasattr(self.game_state, "playerInfo"):
                     print("[ERROR] No player loaded yet.")
                     return
 
                 player = self.game_state.playerInfo
-                handEval = player.deckManager
+                deckManager = player.deckManager
 
-                if hasattr(handEval, "generateRoyalFlushForDebug"):
-                    royal_flush_hand = handEval.generateRoyalFlushForDebug()
-                    player.currentHand = royal_flush_hand
+                if hasattr(deckManager, "generateStraightFlushForDebug"):
+                    sf_hand = deckManager.generateStraightFlushForDebug()
 
-                    player.debugForcedHand = "royal_flush"
+                    # Actualiza la mano del jugador
+                    player.currentHand = sf_hand
+                    player.debugForcedHand = "straight_flush"
 
-                    print("[DEBUG] Royal Flush forced:", " ".join(str(c) for c in royal_flush_hand))
+                    # ACTUALIZA la mano que dibuja handManager
+                    if hasattr(player, "handManager"):
+                        player.handManager.hand = sf_hand
+                        player.handManager.updateHandSprites(sf_hand)
 
+                    print("[DEBUG] Straight Flush forced:", " ".join(str(c) for c in sf_hand))
                 else:
-                    print("[ERROR] deckManager does not support Royal Flush generation.")
+                    print("[ERROR] deckManager does not support Straight Flush generation.")

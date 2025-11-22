@@ -217,18 +217,26 @@ class DeckManager:
         return dealtCards
 
 #BONO - DEBUG
-    def generateRoyalFlushForDebug(self):
-        suit = Suit.HEARTS
+    def generateStraightFlushForDebug(self):
+        from Deck.HandEvaluator import evaluate_hand
+        suits = [Suit.HEARTS, Suit.DIAMONDS, Suit.CLUBS, Suit.SPADES]
+        ranks = [Rank.TWO, Rank.THREE, Rank.FOUR, Rank.FIVE, Rank.SIX,
+                 Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN, Rank.JACK,
+                 Rank.QUEEN, Rank.KING, Rank.ACE]
 
-        needed = [Rank.TEN,
-                  Rank.JACK,
-                  Rank.QUEEN,
-                  Rank.KING,
-                  Rank.ACE]
+        cardImages = self.load_card_images()
 
-        hand = []
-        for rank in needed:
-            card = Card(suit=suit, rank=rank, image=None)
-            hand.append(card)
+        for suit in suits:
+            needed_ranks = ranks[-5:]  # últimos 5 para Straight Flush (10-J-Q-K-A)
+            hand = []
+            for rank in needed_ranks:
+                image = cardImages.get((suit, rank))
+                card = Card(suit=suit, rank=rank, image=image)
+                hand.append(card)
 
+            if evaluate_hand(hand) == "Straight Flush":
+                return hand
+
+        suit = suits[0]
+        hand = [Card(suit=suit, rank=r, image=cardImages.get((suit, r))) for r in ranks[-5:]]
         return hand
