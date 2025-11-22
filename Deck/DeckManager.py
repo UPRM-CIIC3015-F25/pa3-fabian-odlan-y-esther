@@ -147,8 +147,8 @@ class DeckManager:
         cardImages = self.load_card_images(subLevel) #entra a la carpeta que contiene las imágenes y guarda en diccionario
         deck = []
 
-        suits = ["Hearts", "Diamonds", "Clubs", "Spades"]
-        ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+        suits = [Suit.SPADES, Suit.HEARTS, Suit.DIAMONDS, Suit.CLUBS]
+        ranks = [Rank.TWO, Rank.THREE, Rank.FOUR, Rank.FIVE, Rank.SIX, Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.ACE]
 
         for suit in suits: #itero por suit
             for rank in ranks: #itero por cada valor de la carta
