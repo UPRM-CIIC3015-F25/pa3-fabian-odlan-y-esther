@@ -95,6 +95,30 @@ class LevelSelectState(State):
                 #   Avoid unnecessary repetition—use clear condition structure to make the logic readable.
                 self.playerInfo.roundScore = 0
 
+                # Inicializar límites
+                self.playerInfo.discard_limit = 5
+                self.playerInfo.hand_size_limit = 5
+                self.playerInfo.hand_limit = 5
+                self.playerInfo.face_down = False
+                self.playerInfo.discard_random_per_hand = 0
+
+                # Ajustar según el boss activo
+                current_boss = getattr(lm.curSubLevel, 'boss', None)
+
+                if current_boss:
+                    if current_boss == "The Water":
+                        self.playerInfo.discard_limit = 0
+                    elif current_boss == "The Mark":
+                        self.playerInfo.face_down = True
+                    elif current_boss == "The House":
+                        self.playerInfo.face_down = True
+                    elif current_boss == "The Hook":
+                        self.playerInfo.discard_random_per_hand = 2
+                    elif current_boss == "The Manacle":
+                        self.playerInfo.hand_size_limit = max(1, self.playerInfo.hand_size_limit - 1)
+                    elif current_boss == "The Needle":
+                        self.playerInfo.hand_limit = 1
+
                 # Set target score for the new sublevel
                 self.playerInfo.score = self.playerInfo.levelManager.curSubLevel.score
                 
