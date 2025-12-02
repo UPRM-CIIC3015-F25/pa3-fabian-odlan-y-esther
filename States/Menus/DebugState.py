@@ -144,6 +144,30 @@ class DebugState(State):
                         self.game_state.nextState = "LevelSelectState"
                         self.game_state.isFinished = True
 
+            #BONO: Jokers
+            # ← Add a Joker with LEFT arrow + # (0–9)
+            elif self.visible and events.key == pygame.K_LEFT:
+                print("[DEBUG] Press a number (0–9) to add a Joker...")
+
+                # Creamos un flag simple para la próxima tecla numérica
+                self.waiting_for_joker_number = True
+
+            elif self.visible and hasattr(self, "waiting_for_joker_number") and self.waiting_for_joker_number:
+                # Si se espera un número, comprobamos que sea del 0 al 9
+                if pygame.K_0 <= events.key <= pygame.K_9:
+                    index = events.key - pygame.K_0
+                    if self.game_state and index < len(self.game_state.jokerDeck):
+                        joker = self.game_state.jokerDeck[index]
+                        player = self.game_state.playerInfo
+                        if hasattr(player, "playerJokers"):
+                            player.playerJokers.append(joker)
+                        else:
+                            player.playerJokers = [joker]
+                        print(f"[DEBUG] Added Joker: {joker.name}")
+                    else:
+                        print("[DEBUG] Joker index out of range!")
+                    self.waiting_for_joker_number = False
+
             # BONO: Add money (+500$)
             elif self.visible and events.key == pygame.K_UP:
                 print("[DEBUG] Adding $500 to player money...")
