@@ -187,11 +187,12 @@ class DebugState(State):
                     player.currentHand = sf_hand
                     player.debugForcedHand = "straight_flush"
 
-                    # ACTUALIZA la mano que dibuja handManager
-                    if hasattr(player, "handManager"):
-                        player.handManager.hand = sf_hand
-                        player.handManager.updateHandSprites(sf_hand)
+                    # Actualiza los sprites de la mano en GameState
+                    if self.game_state and hasattr(self.game_state, "updateCards"):
+                        # Limpiamos las cartas anteriores y actualizamos con la nueva mano
+                        self.game_state.cards.clear()
+                        self.game_state.hand = sf_hand
+                        self.game_state.updateCards(400, 520, self.game_state.cards, sf_hand, scale=1.2)
 
                     print("[DEBUG] Straight Flush forced:", " ".join(str(c) for c in sf_hand))
-                else:
-                    print("[ERROR] deckManager does not support Straight Flush generation.")
+
