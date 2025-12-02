@@ -38,6 +38,6 @@ PLANETS = {
     "Uranus": PlanetCard("Uranus", "levels up Full House", 9, 25, 5),
     "Neptune": PlanetCard("Neptune", "levels up Four of a Kind", 10, 30, 6),
     "Pluto": PlanetCard("Pluto", "levels up Straight Flush", 11, 35, 6),
-    "Sun": PlanetCard("Sun", "levels up all hands", 15, 45, 7),
+    "Sun": PlanetCard("Sun", "levels up all hands", 15, 45, 7)
 
 }
