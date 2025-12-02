@@ -834,6 +834,26 @@ class GameState(State):
         # total chips for display = base hand value + sum of used Cards' chips
         total_chips = hand_chips + card_chips_sum
 
+        #Elimino cartas usadas
+        for card in used_cards:
+            if card in self.hand:
+                self.hand.remove(card)
+
+            # --- Limitar la mano a máximo 5 cartas ---
+        new_cards_needed = 5 - len(self.hand)
+        if new_cards_needed > 0:
+            self.hand += self.deckManager.dealCards(self.deck, new_cards_needed,
+                                                        self.playerInfo.levelManager.curSubLevel)
+
+        self.SortCards()
+
+        # Limitar la mano por seguridad a 5 cartas
+        if len(self.hand) > 5:
+            self.hand = self.hand[:5]
+
+        # --- Limpiar selección ---
+        self.cardsSelectedList = []
+
         # ------------------- Apply Joker effects -------------------
         owned = set(self.playerJokers)
         # TODO (TASK 5.2): Let the Joker mayhem begin! Implement each Joker’s effect using the Joker table as reference.
@@ -949,27 +969,15 @@ class GameState(State):
     def discardCards(self, cards_to_discard=None, index =0):
         # Initializes the discard list
         if cards_to_discard is None:
-            cards_to_discard = []
-            # Find selected cards in the current hand
-            for card in self.hand:
-                if hasattr(card, 'isSelected') and card.isSelected:
-                    cards_to_discard.append(card)
+            cards_to_discard = self.getSelectedCardsRecursive(self.hand)
 
         # No more cards to process
         if index >= len(cards_to_discard):
             # replace cards
-            cards_to_draw = len(cards_to_discard)
-            for i in range(cards_to_draw):
-                if (hasattr(self.deckManager, 'deck') and self.deckManager.deck and len(self.deckManager.deck) > 0):
-                    new_card = self.deckManager.deck.pop(0)
-                    self.hand.append(new_card)
-                else:
-                    print("No cards left in deck")
-                    break
+            self.drawCardsRecursive(len(cards_to_discard))
 
             # Reset selections
-            for card in self.hand:
-                card.isSelected = False
+            self.resetSelectionsRecursive(self.hand)
 
             # Clear discard related text
             if hasattr(self, 'discard_text'):
@@ -992,3 +1000,28 @@ class GameState(State):
         # Call for next card
         self.discardCards(cards_to_discard, index + 1)
 
+    def getSelectedCardsRecursive(self, hand, idx=0, selected=None):
+        if selected is None:
+            selected = []
+        if idx >= len(hand):
+            return selected
+        card = hand[idx]
+        if hasattr(card, 'isSelected') and card.isSelected:
+            selected.append(card)
+        return self.getSelectedCardsRecursive(hand, idx + 1, selected)
+
+    # Función recursiva para robar n cartas del mazo
+    def drawCardsRecursive(self, n):
+        if n <= 0:
+            return
+        if hasattr(self.deckManager, 'deck') and self.deckManager.deck:
+            new_card = self.deckManager.deck.pop(0)
+            self.hand.append(new_card)
+        self.drawCardsRecursive(n - 1)
+
+    # Función recursiva para resetear selecciones de la mano
+    def resetSelectionsRecursive(self, hand, idx=0):
+        if idx >= len(hand):
+            return
+        hand[idx].isSelected = False
+        self.resetSelectionsRecursive(hand, idx + 1)
