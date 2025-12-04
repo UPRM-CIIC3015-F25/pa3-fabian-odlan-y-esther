@@ -672,6 +672,7 @@ class GameState(State):
 
                 pygame.time.wait(1200)
                 pygame.quit()
+                exit()
 
         self.playerInfo.amountOfHands -= 1
         hand_name = evaluate_hand(self.cardsSelectedList)
