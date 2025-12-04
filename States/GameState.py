@@ -36,6 +36,9 @@ class GameState(State):
         self.jokers = {}
         # track which jokers activated for the current played hand (used to offset their draw)
         self.activated_jokers = set()
+
+        #inicializo el discard pile
+        self.discard_pile = []
         
         # for joker in self.jokerDeck:
         #     print(joker.name)
@@ -967,14 +970,17 @@ class GameState(State):
     #   recursion finishes, reset card selections, clear any display text or tracking lists, and
     #   update the visual layout of the player's hand.
     def discardCards(self, cards_to_discard=None, index =0):
+
         # Initializes the discard list
         if cards_to_discard is None:
             cards_to_discard = self.getSelectedCardsRecursive(self.hand)
 
         # No more cards to process
         if index >= len(cards_to_discard):
-            # replace cards
-            self.drawCardsRecursive(len(cards_to_discard))
+            # Calculate how many cards are needed to refill the hand to 8
+            cards_needed = 8 - len(self.hand)
+            if cards_needed > 0:
+                self.drawCardsRecursive(cards_needed)
 
             # Reset selections
             self.resetSelectionsRecursive(self.hand)
@@ -1014,12 +1020,24 @@ class GameState(State):
     def drawCardsRecursive(self, n):
         if n <= 0:
             return
-        if hasattr(self.deckManager, 'deck') and self.deckManager.deck:
-            new_card = self.deckManager.deck.pop(0)
-            self.hand.append(new_card)
-        self.drawCardsRecursive(n - 1)
 
-    # Función recursiva para resetear selecciones de la mano
+        # Verifica si el mazo está vacío
+        if not self.deck:
+            if hasattr(self, 'discard_pile') and self.discard_pile:
+                random.shuffle(self.discard_pile)
+                self.deck.extend(self.discard_pile) # Añade las cartas de descarte al mazo
+                self.discard_pile = [] # Vacía la pila de descarte
+            else:
+                return
+
+        # Ahora, si hay cartas en el mazo, roba una
+        if self.deck:
+            new_card = self.deck.pop(0)
+            self.hand.append(new_card)
+            self.drawCardsRecursive(n - 1) # Llama recursivamente para la siguiente carta
+        else:
+            return
+
     def resetSelectionsRecursive(self, hand, idx=0):
         if idx >= len(hand):
             return
