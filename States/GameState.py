@@ -540,30 +540,26 @@ class GameState(State):
     #     - Recursive calculation of the overkill bonus (based on how much score exceeds the target)
     #     - A clear base case to stop recursion when all parts are done
     #   Avoid any for/while loops — recursion alone must handle the repetition.
-    def calculate_gold_reward(self, playerInfo, stage=0):
-        if stage == 0 and 'current_gold' not in playerInfo:
-            playerInfo['current_gold'] = 0
-            playerInfo['overkill_ratio'] = 0.0
+    def calculate_gold_reward(self, playerInfo, stage=0, current_gold=0, overkill_ratio=0.0):
         if stage == 0:
-            blind_type = getattr(self, 'blind_type', 'SMALL')
+            cur_sublevel = playerInfo.levelManager.curSubLevel
+            blind_type = cur_sublevel.blind.name if cur_sublevel else "SMALL"
             base_gold_map = {"SMALL": 4, "BIG": 8, "BOSS": 10}
             base_reward = base_gold_map.get(blind_type, 4)
-            score = getattr(self, 'score', 0)
-            target_score = getattr(self, 'target_score', 1)
+            score = playerInfo.roundScore
+            target_score = cur_sublevel.score if cur_sublevel else 1
             ratio = 0.0
             if target_score > 0:
                 ratio = max(0.0, (score - target_score) / target_score)
-            playerInfo['current_gold'] = base_reward
-            playerInfo['overkill_ratio'] = ratio
-            return self.calculate_gold_reward(playerInfo, stage=1)
+            return self.calculate_gold_reward(playerInfo, stage=1, current_gold=base_reward, overkill_ratio=ratio)
+
         elif stage == 1:
-            overkill_ratio = playerInfo['overkill_ratio']
             overkill_bonus = math.ceil(min(5, overkill_ratio * 5))
-            total_reward = playerInfo['current_gold'] + overkill_bonus
-            playerInfo['current_gold'] = total_reward
-            return self.calculate_gold_reward(playerInfo, stage=2)
+            total_reward = current_gold + overkill_bonus
+            return self.calculate_gold_reward(playerInfo, stage=2, current_gold=total_reward, overkill_ratio=overkill_ratio)
         else:
-            return playerInfo['current_gold']
+            return current_gold
+
     def updateCards(self, posX, posY, cardsDict, cardsList, scale=1.5, spacing=90, baseYOffset=-20, leftShift=40):
         cardsDict.clear()
         for i, card in enumerate(cardsList):
