@@ -99,6 +99,7 @@ class LevelSelectState(State):
                 self.playerInfo.discard_limit = 5
                 self.playerInfo.hand_size_limit = 5
                 self.playerInfo.hand_limit = 5
+                self.playerInfo.amountOfhands = 5
                 self.playerInfo.face_down = False
                 self.playerInfo.discard_random_per_hand = 0
 

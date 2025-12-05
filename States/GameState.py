@@ -176,7 +176,7 @@ class GameState(State):
         if self.playerInfo.levelFinished:
             reward = self.calculate_gold_reward(self.playerInfo)
             self.playerInfo.playerMoney += reward
-            self.playerInfo.amountOfHands = 4
+            self.playerInfo.amountOfHands = 5
             self.playerInfo.amountOfDiscards = 4
             self.playerInfo.update()
             self.drawDeckPile()
@@ -189,7 +189,7 @@ class GameState(State):
             self.isFinished = True
             self.deck = State.deckManager.shuffleDeck(State.deckManager.createDeck(self.playerInfo.levelManager.next_unfinished_sublevel()))
             self.hand = State.deckManager.dealCards(self.deck, 8, self.playerInfo.levelManager.next_unfinished_sublevel())
-            self.playerInfo.amountOfHands = 4
+            self.playerInfo.amountOfHands = 5
             self.nextState = "ShopState"
 
             return
@@ -886,7 +886,7 @@ class GameState(State):
         # Gauntlet +250 chips and -2 hand size
         if "Gauntlet" in owned:
             self.playerInfo.playerChips += 250
-            self.hand_size_limit = max(1, self.hand_size_limit - 2)
+            self.playerInfo.hand_size_limit = max(1, self.playerInfo.hand_size_limit - 2)
             self.activated_jokers.add("Gauntlet")
 
         # Ogre +3 multiplier for each Joker
@@ -897,7 +897,7 @@ class GameState(State):
 
         # Straw Hat +100 chips then -5 chips for very hand
         if "Straw Hat" in owned:
-            chips_bonus = 100 - (5 * self.hands_played_this_round)
+            chips_bonus = 100 - (5 * self.playerInfo.hands_played_this_round)
             self.playerInfo.playerChips += max(0, chips_bonus)
             self.activated_jokers.add("Straw Hat")
 

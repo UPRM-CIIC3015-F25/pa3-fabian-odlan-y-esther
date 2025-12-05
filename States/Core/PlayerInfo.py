@@ -10,7 +10,7 @@ class PlayerInfo(State):
         self.roundScore = 0                 # Current round score (depending on curSubLevel)
         self.playerChips = 0                # Current chip count
         self.playerMultiplier = 0           # Current score multiplier
-        self.amountOfHands = 4              # Default number of hands
+        self.amountOfHands = 5             # Default number of hands
         self.amountOfDiscards = 4           # Default number of discards
         self.playerMoney = 0                # Current money
         self.playerAnte = 1                 # Current ante
