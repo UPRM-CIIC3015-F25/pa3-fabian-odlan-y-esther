@@ -681,8 +681,8 @@ class GameState(State):
 
         # Base values from HAND_SCORES
         score_info = HAND_SCORES.get(hand_name, {"chips": 0, "multiplier": 1})
-        hand_chips = score_info.get("chips", 0)
-        hand_mult = score_info.get("multiplier", 1)
+        base_hand_chips = score_info.get("chips", 0)
+        base_hand_mult = score_info.get("multiplier", 1)
 
         # Prepare helpers
         sel = list(self.cardsSelectedList)
@@ -832,7 +832,8 @@ class GameState(State):
             card_chips_sum += c.chips
 
         # total chips for display = base hand value + sum of used Cards' chips
-        total_chips = hand_chips + card_chips_sum
+        self.playerInfo.playerChips = base_hand_chips + card_chips_sum
+        self.playerInfo.playerMultiplier = base_hand_mult
 
         #Elimino cartas usadas
         for card in used_cards:
@@ -865,67 +866,68 @@ class GameState(State):
 
         # The Joker +4 multiplier
         if "The Joker" in owned:
-            self.multiplier += 4
+            self.playerInfo.playerMultiplier += 4
             self.activated_jokers.add("The Joker")
 
         # Michael Myers adds random multiplier from 0 to 23
         if "Michael Myers" in owned:
             random_mult = random.randint(0,23)
-            self.multiplier += random_mult
+            self.playerInfo.playerMultiplier += random_mult
             self.activated_jokers.add("Michael Myers")
 
         # Fibonacci each Ace gives +8 multiplier
         if "Fibonacci" in owned:
             fibonacci_ranks = {1,2,3,5,8}
             for card in self.hand:
-                if card.rank in fibonacci_ranks:
-                    self.multiplier += 8
+                if card.rank.value in fibonacci_ranks:
+                    self.playerInfo.playerMultiplier += 8
             self.activated_jokers.add("Fibonacci")
 
         # Gauntlet +250 chips and -2 hand size
         if "Gauntlet" in owned:
-            self.chips += 250
+            self.playerInfo.playerChips += 250
             self.hand_size_limit = max(1, self.hand_size_limit - 2)
             self.activated_jokers.add("Gauntlet")
 
         # Ogre +3 multiplier for each Joker
         if "Ogre" in owned:
             joker_count = len(owned)
-            self.multiplier += 3 * joker_count
+            self.playerInfo.playerMultiplier += 3 * joker_count
             self.activated_jokers.add("Ogre")
 
         # Straw Hat +100 chips then -5 chips for very hand
         if "Straw Hat" in owned:
             chips_bonus = 100 - (5 * self.hands_played_this_round)
-            self.chips += max(0, chips_bonus)
+            self.playerInfo.playerChips += max(0, chips_bonus)
             self.activated_jokers.add("Straw Hat")
 
         # Hog Rider +100 chips if hand is a straight
         if "Hog Rider" in owned:
-            if self.current_hand_type == "Straight":
-                self.chips += 100
+            current_hand_type = hand_name
+            if current_hand_type == "Straight":
+                self.playerInfo.playerChips += 100
             self.activated_jokers.add("Hog Rider")
 
         # ? Block +4 chips if hand uses exactly 4 cards
         if "? Block" in owned:
             if len(self.hand) == 4:
-                self.chips += 4
+                self.playerInfo.playerChips += 4
             self.activated_jokers.add("? Block")
 
         # Hogwarts each Ace gives +4 multiplier and +20 chips
         if "Hogwarts" in owned:
             aces_played = sum(1 for card in self.hand if card.rank == 1 or card.rank == 14)
         # Check for Ace
-            self.multiplier += 4 * aces_played
-            self.chips += 20 * aces_played
+            self.playerInfo.playerMultiplier += 4 * aces_played
+            self.playerInfo.playerChips += 20 * aces_played
             self.activated_jokers.add("Hogwarts")
 
         # 802 double the amount if it is last hand
         if "802" in owned:
-            if self.amountOfHands == 0:
+            if self.playerInfo.amountOfHands == 0:
         # Double chip and multiplier gains
-                self.chips *= 2
-                self.multiplier *= 2
+                self.playerInfo.playerChips *= 2
+                self.playerInfo.playerMultiplier *= 2
             self.activated_jokers.add("802")
 
 
@@ -934,21 +936,18 @@ class GameState(State):
         procrastinate = False
 
         # commit modified player multiplier and chips
-        self.playerInfo.playerMultiplier = hand_mult
-        self.playerInfo.playerChips = total_chips
         self.playerInfo.curHandOfPlayer = hand_name
         self.playerInfo.curHandText = self.playerInfo.textFont1.render(self.playerInfo.curHandOfPlayer, False, 'white')
 
         # compute amount that will be added to round when timer expires
-        added_to_round = total_chips * hand_mult
+        added_to_round =self.playerInfo.playerChips * self.playerInfo.playerMultiplier
+
         # Procrastination doubles the final hand's addition
-        if 'procrastinate' in locals() and procrastinate:
-            added_to_round *= 2
         self.pending_round_add = added_to_round  # defer actual addition until timer ends
 
         # prepare on-screen feedback
         self.playedHandTextSurface = self.playerInfo.textFont1.render(hand_name, True, 'yellow')
-        score_breakdown_text = f"(Hand: {hand_chips} + Cards: {card_chips_sum}) Chips | x{hand_mult} Mult -> +{added_to_round}"
+        score_breakdown_text = f"(Hand: {base_hand_chips} + Cards: {card_chips_sum}) Chips | x{base_hand_mult} Mult -> +{added_to_round}"
         self.scoreBreakdownTextSurface = self.playerInfo.textFont2.render(score_breakdown_text, True, 'white')
 
         self.playHandStartTime = pygame.time.get_ticks()

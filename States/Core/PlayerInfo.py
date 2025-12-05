@@ -17,6 +17,7 @@ class PlayerInfo(State):
         self.round = 1                      # Current round
         self.curHandOfPlayer = ""           # Current hand of the player
         self.curAmountJoker = "0"           # Current number of jokers used
+        self.hand_size_limit = 5            #Establecer el limite de cartas en la mano
         
         # ----------------------------Level System--------------------------------------------
         self.levelManager = LevelManager(self)  # Must be after playerAnte is set ( DO NOT TOUCH THIS LINE )
@@ -224,8 +225,9 @@ class PlayerInfo(State):
         # ---------------------Hands------------------------------------------------------
         self.playerInfo2Surface.blit(self.handText, pygame.Rect(120, 18, 0, 0))
         pygame.draw.rect(self.playerInfo2Surface, (30, 30, 30), pygame.Rect(110, 45, 80, 50))
-        amountsOfHandsText = self.textFont3.render(str(self.amountOfHands), False, 'blue')
-        self.playerInfo2Surface.blit(amountsOfHandsText, pygame.Rect(140, 50, 0, 0))
+        # Display the current hand_size_limit (based on boss effects)
+        amountsOfHandsText = self.textFont3.render(f"{self.amountOfHands}/{self.hand_size_limit}", False, 'blue')
+        self.playerInfo2Surface.blit(amountsOfHandsText, pygame.Rect(125, 50, 0, 0))
 
         # ---------------------Discards---------------------------------------------------
         self.playerInfo2Surface.blit(self.discardText, pygame.Rect(208, 18, 0, 0))
