@@ -103,7 +103,7 @@ class LevelSelectState(State):
                 self.playerInfo.discard_random_per_hand = 0
 
                 # Ajustar según el boss activo
-                current_boss = getattr(lm.curSubLevel, 'boss', None)
+                current_boss = getattr(lm.curSubLevel, 'bossLevel', None)
 
                 if current_boss:
                     if current_boss == "The Water":
